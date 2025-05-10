@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, request
 import sqlite3
 
 app = Flask(__name__)
@@ -10,7 +10,8 @@ def init_db():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    with open('index.html', 'r', encoding='utf-8') as f:
+        return f.read()
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -20,9 +21,9 @@ def register():
         with sqlite3.connect('kullanicilar.db') as conn:
             conn.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
             conn.commit()
-        return "Kayıt başarılı!"
+        return "Kayıt başarılı! <a href='/'>Geri dön</a>"
     except:
-        return "Kullanıcı zaten var."
+        return "Kullanıcı zaten var. <a href='/'>Geri dön</a>"
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -32,7 +33,7 @@ def login():
         user = conn.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password)).fetchone()
     if user:
         return f"Hoş geldin, {username}!"
-    return "Giriş başarısız!"
+    return "Giriş başarısız! <a href='/'>Geri dön</a>"
 
 if __name__ == '__main__':
     init_db()
